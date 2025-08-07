@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+redis
+rq
+requests
+sqlalchemy
