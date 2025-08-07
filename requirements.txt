@@ -4,3 +4,5 @@ redis
 rq
 requests
 sqlalchemy
+python-dotenv
+gunicorn

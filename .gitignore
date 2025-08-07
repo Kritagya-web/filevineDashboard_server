@@ -1,0 +1,24 @@
+# --- Virtual environments ---
+venv/
+.venv/
+
+# --- Python bytecode / caches ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- dotenv secrets ---
+.env
+
+# --- Local SQLite / DB files ---
+projects.db
+
+# --- Logs ---
+*.log
+
+# --- VS Code workspace settings ---
+.vscode/
+
+# --- OS generated files ---
+.DS_Store
+Thumbs.db
