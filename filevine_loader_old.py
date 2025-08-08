@@ -5,6 +5,7 @@ from auth_refresh import get_dynamic_headers
 import re
 from sqlalchemy import create_engine, text
 from typing import Optional, List
+
 # --- Configuration ---
 API_BASE_URL   = "https://calljacob.api.filevineapp.com"
 COMM_KEYWORDS  = re.compile(r"\b(spoke|call|text|message|vm)\b", re.IGNORECASE)
@@ -20,11 +21,13 @@ DB_URL      = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAM
 
 engine = create_engine(DB_URL, echo=False)
 
-def mmddyyyy_to_iso(s):
+
+def mmddyyyy_to_iso(s: Optional[str]) -> Optional[str]:
     if not s or s == "N/A":
         return None
     m, d, y = s.split("-")
     return f"{y}-{m.zfill(2)}-{d.zfill(2)}"
+
 
 # --- DDL ---
 DDL = """
@@ -42,7 +45,7 @@ CREATE TABLE IF NOT EXISTS projects (
   date_of_incident       DATE NULL,
   client_contact_count   INTEGER,
   latest_client_contact  TIMESTAMP NULL,
-  project_type_code      TEXT     
+  project_type_code      TEXT
 );
 
 CREATE TABLE IF NOT EXISTS negotiation (
@@ -68,8 +71,8 @@ CREATE TABLE IF NOT EXISTS breakdown_info (
   lien_negotiator_company TEXT,
   lien_negotiator_title   TEXT,
   lien_negotiator_dept    TEXT,
-  date_assigned           DATE NULL, 
-  date_completed          DATE NULL 
+  date_assigned           DATE NULL,
+  date_completed          DATE NULL
 );
 
 CREATE TABLE IF NOT EXISTS lit_case_review (
@@ -104,7 +107,7 @@ with engine.begin() as conn:
             conn.execute(text(stmt))
 
 
-def fetch_json(endpoint):
+def fetch_json(endpoint: str):
     headers = get_dynamic_headers()
     try:
         r = requests.get(API_BASE_URL + endpoint, headers=headers)
@@ -114,7 +117,7 @@ def fetch_json(endpoint):
             r = requests.get(API_BASE_URL + endpoint, headers=headers)
         elif r.status_code == 429:
             # Handle rate limiting
-            retry_after = int(r.headers.get('Retry-After', 5))
+            retry_after = int(r.headers.get("Retry-After", 5))
             print(f"⚠️ Rate limited, sleeping for {retry_after} seconds...")
             time.sleep(retry_after)
             return fetch_json(endpoint)  # Retry after delay
@@ -124,17 +127,18 @@ def fetch_json(endpoint):
         print(f"⚠️ Request failed for {endpoint}: {e}")
         return {}
 
-def format_date(datestr):
+
+def format_date(datestr: Optional[str]) -> str:
     if not datestr:
         return "N/A"
     try:
         dt = datetime.fromisoformat(datestr[:10])
         return dt.strftime("%m-%d-%Y")
-    except:
+    except Exception:
         return datestr
 
 
-def sol_dol_meds_policy_limits(pid):
+def sol_dol_meds_policy_limits(pid: int) -> dict:
     vitals = fetch_json(f"/core/projects/{pid}/vitals") or []
     mapping = {
         "SOL": "sol18747Due",
@@ -152,11 +156,11 @@ def sol_dol_meds_policy_limits(pid):
         ft = item.get("fieldType")
         for label, field in mapping.items():
             if fn == field:
-                out[label] = format_date(val) if ft == "DateOnly" else val or "N/A"
+                out[label] = format_date(val) if ft == "DateOnly" else (val or "N/A")
     return out
 
 
-def get_intake_date(pid):
+def get_intake_date(pid: int) -> str:
     try:
         data = fetch_json(f"/core/projects/{pid}/Forms/lOJEIntake20Demo")
         return format_date(data.get("incidentDate_1")) if isinstance(data, dict) else "N/A"
@@ -164,50 +168,70 @@ def get_intake_date(pid):
         print(f"⚠️ Intake form error for {pid}: {e}")
         return "N/A"
 
-def get_case_summary_sol(pid):
+
+def get_case_summary_sol(pid: int) -> str:
     try:
         data = fetch_json(f"/core/projects/{pid}/Forms/caseSummary")
     except requests.HTTPError as e:
         print(f"⚠️ CaseSummary form error for {pid}: {e}")
         return "N/A"
 
-    # If fetch_json returned None (or anything that isn’t a dict), bail out:
     if not isinstance(data, dict):
         return "N/A"
 
-    # Drill down safely
     sol_section = data.get("sOL", {})
-    date_val   = sol_section.get("dateValue")
+    date_val = sol_section.get("dateValue")
     if not date_val:
         return "N/A"
-
-    # Format or fallback
     return format_date(date_val)
 
-def get_nego_info(pid):
+
+def get_nego_info(pid: int) -> dict:
+    """
+    Returns a dict with keys:
+    negotiator, settlement_date, settled, settled_amount, last_offer,
+    last_offer_date, date_assigned_to_nego
+    """
     try:
         d = fetch_json(f"/core/projects/{pid}/Forms/negotiation") or {}
     except requests.HTTPError as e:
-        if e.response.status_code == 404:
+        if e.response is not None and e.response.status_code == 404:
             print(f"⚠️ Negotiation form not found for {pid}")
-            return {
-                "negotiator": "N/A",
-                "settlement_date": None,
-                "settled": "N/A",
-                "settled_amount": None,
-                "last_offer": "N/A",
-                "last_offer_date": None,
-                "date_assigned_to_nego": None
-            }
-        print(f"⚠️ Negotiation form error for {pid}: {e}")
-        return {}
-def get_insurance(pid):
+        else:
+            print(f"⚠️ Negotiation form error for {pid}: {e}")
+        return {
+            "negotiator": "N/A",
+            "settlement_date": None,
+            "settled": "N/A",
+            "settled_amount": None,
+            "last_offer": "N/A",
+            "last_offer_date": None,
+            "date_assigned_to_nego": None,
+        }
+
+    negotiator = (d.get("negotiatorAssignedTo") or {}).get("fullname", "N/A")
+    return {
+        "negotiator": negotiator or "N/A",
+        "settlement_date": d.get("settlementDate"),
+        "settled": d.get("settled", "N/A"),
+        "settled_amount": d.get("settledAmount"),
+        "last_offer": d.get("lastOffer", "N/A"),
+        "last_offer_date": d.get("lastOfferDate"),
+        "date_assigned_to_nego": d.get("dateAssignedToNegotiations"),
+    }
+
+
+def get_insurance(pid: int) -> dict:
     d = fetch_json(f"/core/projects/{pid}/Forms/demandPrep") or {}
-    di, ci = d.get("defendantInsurance", {}) or {}, d.get("clientsInsuranceCompany", {}) or {}
-    return {"def_name": di.get("fullname", "N/A"), "cli_name": ci.get("fullname", "N/A")}
+    di = d.get("defendantInsurance", {}) or {}
+    ci = d.get("clientsInsuranceCompany", {}) or {}
+    return {
+        "def_name": di.get("fullname", "N/A"),
+        "cli_name": ci.get("fullname", "N/A"),
+    }
 
 
-def get_notes(project_id):
+def get_notes(project_id: int) -> list:
     headers = get_dynamic_headers()
     all_notes, offset, limit = [], 0, 50
 
@@ -236,7 +260,7 @@ def get_notes(project_id):
     return all_notes
 
 
-def analyze_notes(notes):
+def analyze_notes(notes: list) -> tuple[int, Optional[datetime]]:
     total_contacts, latest_date = 0, None
     for note in notes:
         if note.get("typeTag") != "note":
@@ -258,56 +282,64 @@ def analyze_notes(notes):
     return total_contacts, latest_date
 
 
-def get_client_contact_metrics(pid):
+def get_client_contact_metrics(pid: int) -> tuple[int, Optional[datetime]]:
     notes = get_notes(pid)
     return analyze_notes(notes)
 
-def get_breakdown(pid):
+
+def get_breakdown(pid: int) -> dict:
     try:
         d = fetch_json(f"/core/projects/{pid}/Forms/breakdown") or {}
     except requests.HTTPError as e:
         print(f"⚠️ Breakdown form error for {pid}: {e}")
         d = {}
+
     ln = d.get("lienNegotiatorAssignedTo") or {}
-    
+
     def fmt(raw):
-        if not raw or raw == "N/A": 
-            return None  # Return None instead of "N/A" for dates
-        try: 
+        if not raw or raw == "N/A":
+            return None
+        try:
             return datetime.fromisoformat(raw[:10]).strftime("%m-%d-%Y")
-        except: 
-            return None  # Return None if date parsing fails
-    
+        except Exception:
+            return None
+
     return {
         "lien_name": ln.get("fullname", "N/A"),
         "lien_company": ln.get("fromCompany", "N/A"),
         "lien_title": ln.get("jobTitle", "N/A"),
         "lien_dept": ln.get("department", "N/A"),
         "date_assigned": fmt(d.get("dateAssignedToBreakdown")),
-        "date_completed": fmt(d.get("dateCompleted"))
+        "date_completed": fmt(d.get("dateCompleted")),
     }
 
-def get_lit_review(pid):
+
+def get_lit_review(pid: int) -> dict:
     try:
         d = fetch_json(f"/core/projects/{pid}/Forms/litCaseReview2") or {}
     except requests.HTTPError as e:
         print(f"⚠️ LitCaseReview form error for {pid}: {e}")
         d = {}
+
     def fmt(raw):
-        if not raw: return "N/A"
-        try: return datetime.fromisoformat(raw[:10]).strftime("%m-%d-%Y")
-        except: return raw
+        if not raw:
+            return "N/A"
+        try:
+            return datetime.fromisoformat(raw[:10]).strftime("%m-%d-%Y")
+        except Exception:
+            return raw
+
     return {
         "trial_date": fmt(d.get("trialDate")),
         "date_complaint_filed": fmt(d.get("dateComplainWasFiled")),
         "date_attorney_assigned": fmt(d.get("dateAttorneyWasAssigned")),
         "settlement_amount": d.get("settlementAmount") or "N/A",
         "settlement_date": fmt(d.get("settlementDate")),
-        "dismissal_filed_on": fmt(d.get("dismissalFiledOn"))
+        "dismissal_filed_on": fmt(d.get("dismissalFiledOn")),
     }
 
 
-def get_demand_info(pid):
+def get_demand_info(pid: int) -> tuple[Optional[str], Optional[str]]:
     try:
         d = fetch_json(f"/core/projects/{pid}/Forms/demand") or {}
     except requests.HTTPError as e:
@@ -316,10 +348,10 @@ def get_demand_info(pid):
     raw = d.get("demandApproved")
     return (format_date(raw) if isinstance(raw, str) else None, d.get("approvedBy"))
 
-def get_project_teams(pid):
+
+def get_project_teams(pid: int) -> list:
     data = fetch_json(f"/core/projects/{pid}/teams") or {}
 
-    # ← NEW: if the endpoint returns a list outright, just return it
     if isinstance(data, list):
         return data
 
@@ -329,30 +361,29 @@ def get_project_teams(pid):
     return []
 
 
-
-def get_team_members(team_id):
+def get_team_members(team_id: int) -> list:
     data = fetch_json(f"/core/teams/{team_id}") or {}
-    for key in ("teamMembers","members","data","results"):
+    for key in ("teamMembers", "members", "data", "results"):
         if isinstance(data.get(key), list):
             return data[key]
     return []
 
 
-def get_relevant_team_members(pid):
+def get_relevant_team_members(pid: int) -> list[dict]:
     result, found = [], set()
     for team in get_project_teams(pid):
         tid = team["id"]["native"]
-        if team.get("name") == "Default Team" or tid in {240,242,2014}:
+        if team.get("name") == "Default Team" or tid in {240, 242, 2014}:
             continue
         for m in get_team_members(tid):
-            full = m.get("fullname","N/A").strip()
-            email = m.get("email","N/A").strip()
-            roles = {r.get("name","") for r in m.get("teamRoles",[])}
+            full = (m.get("fullname", "N/A") or "N/A").strip()
+            email = (m.get("email", "N/A") or "N/A").strip()
+            roles = {r.get("name", "") for r in m.get("teamRoles", [])}
             for role in roles & TARGET_ROLES:
                 found.add(role)
                 result.append({"full_name": full, "email": email, "role": role})
     for role in TARGET_ROLES - found:
-        result.append({"full_name":"N/A","email":"N/A","role":role})
+        result.append({"full_name": "N/A", "email": "N/A", "role": role})
     return result
 
 
@@ -477,30 +508,11 @@ ON CONFLICT (project_id) DO UPDATE SET
   paralegal    = EXCLUDED.paralegal;
 """)
 
-# def get_projects_by_type(code: str, limit: int = 200) -> list[int]:
-#     projects, offset, page_sz = [], 0, 100
-#     while len(projects) < limit:
-#         headers = get_dynamic_headers()
-#         resp = requests.get(f"{API_BASE_URL}/core/projects?offset={offset}&limit={page_sz}", headers=headers)
-#         resp.raise_for_status()
-#         items = resp.json().get("items", [])
-#         if not items:
-#             break
-#         for pj in items:
-#             if pj.get("projectTypeCode") == code:
-#                 projects.append(pj["projectId"]["native"])
-#                 if len(projects) >= limit:
-#                     break
-#         if len(items) < page_sz:
-#             break
-#         offset += page_sz
-#     return projects
-
 
 def get_projects_by_type(code: str, limit: Optional[int] = None) -> List[int]:
     """
     Fetch all project IDs of a given FileVine projectTypeCode.
-    If `limit` is None, will page until no more items; otherwise stops at `limit`.
+    If limit is None, will page until no more items; otherwise stops at limit.
     """
     projects: List[int] = []
     offset = 0
@@ -521,7 +533,6 @@ def get_projects_by_type(code: str, limit: Optional[int] = None) -> List[int]:
                 },
                 timeout=30,
             )
-            # Retry once if unauthorized
             if resp.status_code == 401:
                 headers = get_dynamic_headers()
                 resp = requests.get(
@@ -534,23 +545,19 @@ def get_projects_by_type(code: str, limit: Optional[int] = None) -> List[int]:
 
             items = resp.json().get("items", [])
             if not items:
-                # no more pages
                 break
 
             for pj in items:
                 pid = pj["projectId"]["native"]
                 projects.append(pid)
-                # if a numeric limit is set and we've reached it, bail out
                 if limit is not None and len(projects) >= limit:
                     break
 
-            # stop if we hit our numeric limit
             if limit is not None and len(projects) >= limit:
                 break
 
-            # otherwise advance to next page
             offset += page_sz
-            attempts = 0  # reset on success
+            attempts = 0
 
         except requests.exceptions.RequestException as e:
             attempts += 1
@@ -561,87 +568,14 @@ def get_projects_by_type(code: str, limit: Optional[int] = None) -> List[int]:
             print(f"⚠️ Error fetching projects (attempt {attempts}), retrying in {backoff}s: {e}")
             time.sleep(backoff)
 
-    # warn if we asked for N but got fewer
     if limit is not None and len(projects) < limit:
         print(f"⚠️ Warning: Only found {len(projects)}/{limit} projects of type '{code}'")
 
     return projects if limit is None else projects[:limit]
 
 
-# def load_project(pid):
-#     pj = fetch_json(f"/core/projects/{pid}") or {}
-#     print(f"⏳ Loading {pid} – {pj.get('projectOrClientName','<no name>')} …")
-
-#     vitals   = sol_dol_meds_policy_limits(pid)
-#     nego     = get_nego_info(pid)
-#     ins      = get_insurance(pid)
-#     br       = get_breakdown(pid)
-#     lit      = get_lit_review(pid)
-#     demand_dt, demand_by = get_demand_info(pid)
-#     contact_count, contact_latest = get_client_contact_metrics(pid)
-#     project_type_code = pj.get("projectTypeCode")
-
-#     rec = {
-#         "project_id":          pj["projectId"]["native"],
-#         "project_name":        pj.get("projectOrClientName", "N/A"),
-#         "phase_name":          pj.get("phaseName"),
-#         "incident_date":       mmddyyyy_to_iso(format_date(pj.get("incidentDate"))),
-#         "sol_due_date":        mmddyyyy_to_iso(get_case_summary_sol(pid)),
-#         "total_meds":          float(vitals["Total Meds"]) if vitals["Total Meds"] != "N/A" else None,
-#         "policy_limits":       vitals["Policy Limits"],
-#         "personal_injury_type": vitals["Personal Injury Type"],
-#         "liability_decision":  vitals["Liability Decision"],
-#         "last_offer":          vitals.get("Last Offer", "N/A"),
-#         "date_of_incident":    mmddyyyy_to_iso(get_intake_date(pid)),
-#         "client_contact_count":  contact_count,
-#         "latest_client_contact": contact_latest,
-#         "project_type_code":     project_type_code
-#     }
-
-#     with engine.begin() as conn:
-#         conn.execute(UPSERT_PROJECT, rec)
-#         conn.execute(UPSERT_NEGOTIATION, {
-#             "project_id":            pid,
-#             "negotiator":            nego["negotiator"],
-#             "settlement_date":       mmddyyyy_to_iso(nego["settlement_date"]),
-#             "settled":               nego["settled"],
-#             "settled_amount":        nego["settled_amount"],
-#             "last_offer":            nego["last_offer"],
-#             "last_offer_date":       mmddyyyy_to_iso(nego["last_offer_date"]),
-#             "date_assigned_to_nego": mmddyyyy_to_iso(nego["date_assigned_to_nego"]),
-#         })
-#         conn.execute(UPSERT_INSURANCE, {
-#             "project_id": pid,
-#             "def_name":   ins["def_name"],
-#             "cli_name":   ins["cli_name"]
-#         })
-#         conn.execute(UPSERT_BREAKDOWN, {"project_id": pid, **br})
-#         conn.execute(UPSERT_LIT, {
-#             "project_id": pid,
-#             "trial_date": lit["trial_date"],
-#             "date_complaint_filed": lit["date_complaint_filed"],
-#             "date_attorney_assigned": lit["date_attorney_assigned"],
-#             "settlement_amount": lit["settlement_amount"],
-#             "settlement_date": lit["settlement_date"],
-#             "dismissal_filed_on": lit["dismissal_filed_on"]
-#         })
-#         conn.execute(UPSERT_DEMAND, {
-#             "project_id": pid,
-#             "demand_approved": demand_dt,
-#             "approved_by": demand_by
-#         })
-#         role_map = {m["role"]: m["full_name"] for m in get_relevant_team_members(pid)}
-#         conn.execute(UPSERT_CONTACTS, {
-#             "project_id": pid,
-#             "case_manager": role_map.get("Case Manager", "N/A"),
-#             "supervisor":   role_map.get("Supervisor", "N/A"),
-#             "attorney":     role_map.get("Attorney", "N/A"),
-#             "paralegal":    role_map.get("Paralegal", "N/A")
-#         })
-
-def load_project(pid):
+def load_project(pid: int):
     try:
-        # Fetch basic project info
         pj = fetch_json(f"/core/projects/{pid}") or {}
         if not pj:
             print(f"⚠️ Could not fetch project {pid}")
@@ -649,7 +583,6 @@ def load_project(pid):
 
         print(f"⏳ Loading {pid} – {pj.get('projectOrClientName','<no name>')} ...")
 
-        # Get all data with error handling
         vitals = sol_dol_meds_policy_limits(pid) or {}
         nego = get_nego_info(pid) or {}
         ins = get_insurance(pid) or {"def_name": "N/A", "cli_name": "N/A"}
@@ -659,118 +592,119 @@ def load_project(pid):
         contact_count, contact_latest = get_client_contact_metrics(pid)
         project_type_code = pj.get("projectTypeCode")
 
-        # Prepare project record
+        cs_sol = get_case_summary_sol(pid)
+        intake_dt = get_intake_date(pid)
+
         rec = {
-            "project_id":          pj["projectId"]["native"],
-            "project_name":        pj.get("projectOrClientName", "N/A"),
-            "phase_name":          pj.get("phaseName"),
-            "incident_date":       mmddyyyy_to_iso(format_date(pj.get("incidentDate"))) 
-                                if pj.get("incidentDate") else None,
-            "sol_due_date":        mmddyyyy_to_iso(get_case_summary_sol(pid)) 
-                                if get_case_summary_sol(pid) != "N/A" else None,
-            "total_meds":          float(vitals.get("Total Meds")) 
-                                if vitals.get("Total Meds") not in [None, "N/A"] else None,
-            "policy_limits":       vitals.get("Policy Limits", "N/A"),
-            "personal_injury_type":vitals.get("Personal Injury Type", "N/A"),
-            "liability_decision":  vitals.get("Liability Decision", "N/A"),
-            "last_offer":          vitals.get("Last Offer", "N/A"),
-            "date_of_incident":    mmddyyyy_to_iso(get_intake_date(pid)) 
-                                if get_intake_date(pid) != "N/A" else None,
-            "client_contact_count":contact_count,
-            "latest_client_contact":contact_latest,
-            "project_type_code":   project_type_code
+            "project_id":           pj["projectId"]["native"],
+            "project_name":         pj.get("projectOrClientName", "N/A"),
+            "phase_name":           pj.get("phaseName"),
+            "incident_date":        mmddyyyy_to_iso(format_date(pj.get("incidentDate")))
+                                   if pj.get("incidentDate") else None,
+            "sol_due_date":         mmddyyyy_to_iso(cs_sol) if cs_sol != "N/A" else None,
+            "total_meds":           float(vitals.get("Total Meds"))
+                                   if vitals.get("Total Meds") not in [None, "N/A"] else None,
+            "policy_limits":        vitals.get("Policy Limits", "N/A"),
+            "personal_injury_type": vitals.get("Personal Injury Type", "N/A"),
+            "liability_decision":   vitals.get("Liability Decision", "N/A"),
+            "last_offer":           vitals.get("Last Offer", "N/A"),
+            "date_of_incident":     mmddyyyy_to_iso(intake_dt) if intake_dt != "N/A" else None,
+            "client_contact_count": contact_count,
+            "latest_client_contact": contact_latest,
+            "project_type_code":    project_type_code,
         }
 
-
         with engine.begin() as conn:
-            # Insert project data
             conn.execute(UPSERT_PROJECT, rec)
-            
-            # Insert negotiation data if available
+
             if nego:
                 conn.execute(UPSERT_NEGOTIATION, {
                     "project_id":            pid,
                     "negotiator":            nego.get("negotiator", "N/A"),
-                    "settlement_date":       mmddyyyy_to_iso(nego.get("settlement_date")) if nego.get("settlement_date") != "N/A" else None,
+                    "settlement_date":       mmddyyyy_to_iso(format_date(nego.get("settlement_date")))
+                                            if nego.get("settlement_date") else None,
                     "settled":               nego.get("settled", "N/A"),
-                    "settled_amount":        float(nego.get("settled_amount")) if nego.get("settled_amount") not in [None, "N/A"] else None,
+                    "settled_amount":        float(nego.get("settled_amount"))
+                                            if nego.get("settled_amount") not in [None, "N/A"] else None,
                     "last_offer":            nego.get("last_offer", "N/A"),
-                    "last_offer_date":       mmddyyyy_to_iso(nego.get("last_offer_date")) if nego.get("last_offer_date") != "N/A" else None,
-                    "date_assigned_to_nego": mmddyyyy_to_iso(nego.get("date_assigned_to_nego")) if nego.get("date_assigned_to_nego") != "N/A" else None,
+                    "last_offer_date":       mmddyyyy_to_iso(format_date(nego.get("last_offer_date")))
+                                            if nego.get("last_offer_date") else None,
+                    "date_assigned_to_nego": mmddyyyy_to_iso(format_date(nego.get("date_assigned_to_nego")))
+                                            if nego.get("date_assigned_to_nego") else None,
                 })
-            
-            # Insert insurance info
+
             conn.execute(UPSERT_INSURANCE, {
                 "project_id": pid,
                 "def_name":   ins.get("def_name", "N/A"),
-                "cli_name":   ins.get("cli_name", "N/A")
+                "cli_name":   ins.get("cli_name", "N/A"),
             })
-            
-            # Insert breakdown info if available
+
             if br:
                 conn.execute(UPSERT_BREAKDOWN, {
-                    "project_id": pid,
-                    "lien_name": br.get("lien_name", "N/A"),
-                    "lien_company": br.get("lien_company", "N/A"),
-                    "lien_title": br.get("lien_title", "N/A"),
-                    "lien_dept": br.get("lien_dept", "N/A"),
-                    "date_assigned": mmddyyyy_to_iso(br.get("date_assigned")) if br.get("date_assigned") != "N/A" else None,
-                    "date_completed": mmddyyyy_to_iso(br.get("date_completed")) if br.get("date_completed") != "N/A" else None
+                    "project_id":    pid,
+                    "lien_name":     br.get("lien_name", "N/A"),
+                    "lien_company":  br.get("lien_company", "N/A"),
+                    "lien_title":    br.get("lien_title", "N/A"),
+                    "lien_dept":     br.get("lien_dept", "N/A"),
+                    "date_assigned": mmddyyyy_to_iso(br.get("date_assigned"))
+                                     if br.get("date_assigned") and br.get("date_assigned") != "N/A" else None,
+                    "date_completed": mmddyyyy_to_iso(br.get("date_completed"))
+                                      if br.get("date_completed") and br.get("date_completed") != "N/A" else None,
                 })
-            
-            # Insert litigation info if available
+
             if lit:
                 conn.execute(UPSERT_LIT, {
-                    "project_id": pid,
-                    "trial_date": mmddyyyy_to_iso(lit.get("trial_date")) if lit.get("trial_date") != "N/A" else None,
-                    "date_complaint_filed": mmddyyyy_to_iso(lit.get("date_complaint_filed")) if lit.get("date_complaint_filed") != "N/A" else None,
-                    "date_attorney_assigned": mmddyyyy_to_iso(lit.get("date_attorney_assigned")) if lit.get("date_attorney_assigned") != "N/A" else None,
-                    "settlement_amount": lit.get("settlement_amount", "N/A"),
-                    "settlement_date": mmddyyyy_to_iso(lit.get("settlement_date")) if lit.get("settlement_date") != "N/A" else None,
-                    "dismissal_filed_on": mmddyyyy_to_iso(lit.get("dismissal_filed_on")) if lit.get("dismissal_filed_on") != "N/A" else None
+                    "project_id":             pid,
+                    "trial_date":             mmddyyyy_to_iso(lit.get("trial_date"))
+                                              if lit.get("trial_date") != "N/A" else None,
+                    "date_complaint_filed":   mmddyyyy_to_iso(lit.get("date_complaint_filed"))
+                                              if lit.get("date_complaint_filed") != "N/A" else None,
+                    "date_attorney_assigned": mmddyyyy_to_iso(lit.get("date_attorney_assigned"))
+                                              if lit.get("date_attorney_assigned") != "N/A" else None,
+                    "settlement_amount":      lit.get("settlement_amount", "N/A"),
+                    "settlement_date":        mmddyyyy_to_iso(lit.get("settlement_date"))
+                                              if lit.get("settlement_date") != "N/A" else None,
+                    "dismissal_filed_on":     mmddyyyy_to_iso(lit.get("dismissal_filed_on"))
+                                              if lit.get("dismissal_filed_on") != "N/A" else None,
                 })
-            
-            # Insert demand info if available
+
             if demand_dt or demand_by:
                 conn.execute(UPSERT_DEMAND, {
-                    "project_id": pid,
-                    "demand_approved": mmddyyyy_to_iso(demand_dt) if demand_dt and demand_dt != "N/A" else None,
-                    "approved_by": demand_by or "N/A"
+                    "project_id":      pid,
+                    "demand_approved": mmddyyyy_to_iso(demand_dt)
+                                       if demand_dt and demand_dt != "N/A" else None,
+                    "approved_by":     demand_by or "N/A",
                 })
-            
-            # Insert contact info
+
             role_map = {m["role"]: m["full_name"] for m in get_relevant_team_members(pid)}
             conn.execute(UPSERT_CONTACTS, {
-                "project_id": pid,
+                "project_id":  pid,
                 "case_manager": role_map.get("Case Manager", "N/A"),
                 "supervisor":   role_map.get("Supervisor", "N/A"),
                 "attorney":     role_map.get("Attorney", "N/A"),
-                "paralegal":    role_map.get("Paralegal", "N/A")
+                "paralegal":    role_map.get("Paralegal", "N/A"),
             })
 
     except Exception as e:
         print(f"❌ Failed to load {pid}: {str(e)}")
-        # Optional: log full error for debugging
         import traceback
         traceback.print_exc()
-        raise  # Re-raise if you want the main loop to track failed projects
+        raise
 
 
 if __name__ == "__main__":
-    # Initialize variables
     project_ids = get_projects_by_type("LOJE 2.0", limit=None)
     print(f"Total projects fetched: {len(project_ids)}")
-    
-    failed_projects = []
+
+    failed_projects: List[int] = []
     successful_count = 0
     batch_size = 20
     retry_delay = 5  # seconds
-    
-    # Process projects in batches
+
     for i in range(0, len(project_ids), batch_size):
         batch = project_ids[i:i + batch_size]
-        print(f"\nProcessing batch {i//batch_size + 1} (projects {i+1}-{min(i+batch_size, len(project_ids))})...")
-        
+        print(f"\nProcessing batch {i // batch_size + 1} (projects {i + 1}-{min(i + batch_size, len(project_ids))})...")
+
         for pid in batch:
             try:
                 load_project(pid)
@@ -779,17 +713,15 @@ if __name__ == "__main__":
                 print(f"❌ Failed to load {pid}: {str(e)}")
                 failed_projects.append(pid)
                 continue
-        
-        # Add delay between batches to avoid rate limiting
+
         if i + batch_size < len(project_ids):
             print(f"⏳ Waiting {retry_delay} seconds before next batch...")
             time.sleep(retry_delay)
-    
-    # Retry failed projects once
+
     if failed_projects:
         print(f"\nRetrying {len(failed_projects)} failed projects...")
-        retry_failed = []
-        
+        retry_failed: List[int] = []
+
         for pid in failed_projects:
             try:
                 print(f"\nRetrying project {pid}")
@@ -799,11 +731,15 @@ if __name__ == "__main__":
                 print(f"❌ Failed again to load {pid}: {str(e)}")
                 retry_failed.append(pid)
                 continue
-        
-        # Final report
-        print("\n" + "="*50)
-        print(f"Processing complete!")
+
+        print("\n" + "=" * 50)
+        print("Processing complete!")
         print(f"Successfully loaded: {successful_count}/{len(project_ids)}")
         print(f"Failed after retry: {len(retry_failed)}")
         if retry_failed:
             print("Failed project IDs:", retry_failed)
+    else:
+        print("\n" + "=" * 50)
+        print("Processing complete!")
+        print(f"Successfully loaded: {successful_count}/{len(project_ids)}")
+        print("Failed after retry: 0")
