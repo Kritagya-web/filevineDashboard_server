@@ -1,0 +1,11 @@
+# build up a little hashtable and convert it to JSON
+$payload = @{
+  ProjectId = 12345
+  Event     = 'Test_Event'
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+  -Uri http://localhost:8000/webhook `
+  -Method POST `
+  -ContentType 'application/json' `
+  -Body $payload
