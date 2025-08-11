@@ -400,7 +400,7 @@ def get_relevant_team_members(pid):
     result, found = [], set()
     for team in get_project_teams(pid):
         tid = team["id"]["native"]
-        if team.get("name") == "Default Team" or tid in {240,242,2014}:
+        if team.get("name") == "Default Team" or tid in {0, 240, 242, 2014, 305, 1731, 1584, 1380}:
             continue
         for m in get_team_members(tid):
             full = m.get("fullname","N/A").strip()
