@@ -15,7 +15,7 @@ DB_USER     = "postgres"
 DB_PASSWORD = "kritagya"
 DB_HOST     = "localhost"
 DB_PORT     = "5432"
-DB_NAME     = "powerBIDashboard"
+DB_NAME     = "postgres"
 DB_URL      = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 engine = create_engine(DB_URL, echo=False)
