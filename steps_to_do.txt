@@ -1,0 +1,290 @@
+PIMaster -> Forms/intake2
+LOJE 2.0 -> lOJEIntake20Demo
+LOJE 2.2 -> lOJEIntake20Demo
+WC -> /Forms/wCIntake
+
+mongodb+srv://kritagya:kritagya@cluster0.ebu0ir2.mongodb.net/
+
+
+
+window 1
+
+PS C:\WINDOWS\system32> wsl
+kritagya@Kritagya-Kumra-BRPC93:/mnt/c/WINDOWS/system32$ cd /mnt/c/Kritagya\ Folder/FileVineBI/filevineBIDashboardServer
+kritagya@Kritagya-Kumra-BRPC93:/mnt/c/Kritagya Folder/FileVineBI/filevineBIDashboardServer$ rq worker --verbose filevine
+Command 'rq' not found, but can be installed with:
+sudo apt install python3-rq
+kritagya@Kritagya-Kumra-BRPC93:/mnt/c/Kritagya Folder/FileVineBI/filevineBIDashboardServer$ source venv/bin/activate
+(venv) kritagya@Kritagya-Kumra-BRPC93:/mnt/c/Kritagya Folder/FileVineBI/filevineBIDashboardServer$ rq worker --verbose filevine
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: registering birth
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: started with PID 627, version 2.4.1
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: subscribing to channel rq:pubsub:adf88bd71e3945029878bf8a1cfe1d1e
+08:53:24 *** Listening on filevine...
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: cleaning registries for queue: filevine
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: *** Listening on filevine...
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: dequeueing jobs on queues filevine and timeout 405
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: dequeued job 6caee37a-50c4-4ac3-be1e-4ed296c272f2 from filevine
+08:53:24 filevine: worker_tasks.process_project(2304870) (6caee37a-50c4-4ac3-be1e-4ed296c272f2)
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: started job registry set.
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: preparing for execution of job ID 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 90 seconds.
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: job preparation finished.
+08:53:24 Worker adf88bd71e3945029878bf8a1cfe1d1e: performing job 6caee37a-50c4-4ac3-be1e-4ed296c272f2 ...
+🚀 Worker: processing project 2304870
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⏳ Loading 2304870 – Moreno, Alex (Auto / Major PD)( NO UM)( DEF 15/30)90% accepted ...
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⚠️ Request failed for /core/projects/2304870/lOJEIntake20Demo: 404 Client Error: Not Found for url: https://calljacob.api.filevineapp.com/core/projects/2304870/lOJEIntake20Demo
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+✅ Worker: done project 2304870
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: finished performing job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: finished performing job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: handling successful execution of job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: handling successful execution of job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: enqueueing dependents of job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: enqueueing dependents of job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: calling multi() on pipeline for job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: calling multi() on pipeline for job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: saving job 6caee37a-50c4-4ac3-be1e-4ed296c272f2's successful execution result
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: saving job 6caee37a-50c4-4ac3-be1e-4ed296c272f2's successful execution result
+08:53:50 Job 6caee37a-50c4-4ac3-be1e-4ed296c272f2: handling success...
+DEBUG:rq.job:Job 6caee37a-50c4-4ac3-be1e-4ed296c272f2: handling success...
+08:53:50 Cleaning up execution of job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+DEBUG:rq.worker:Cleaning up execution of job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+08:53:50 Cleaning up execution of job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+DEBUG:rq.worker:Cleaning up execution of job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+08:53:50 Successfully completed worker_tasks.process_project(2304870) job in 0:00:26.366661s on worker adf88bd71e3945029878bf8a1cfe1d1e
+INFO:rq.worker:Successfully completed worker_tasks.process_project(2304870) job in 0:00:26.366661s on worker adf88bd71e3945029878bf8a1cfe1d1e
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: finished handling successful execution of job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: finished handling successful execution of job 6caee37a-50c4-4ac3-be1e-4ed296c272f2
+08:53:50 filevine: Job OK (6caee37a-50c4-4ac3-be1e-4ed296c272f2)
+INFO:rq.worker:filevine: Job OK (6caee37a-50c4-4ac3-be1e-4ed296c272f2)
+08:53:50 Result is kept for 500 seconds
+INFO:rq.worker:Result is kept for 500 seconds
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: work horse finished for job 6caee37a-50c4-4ac3-be1e-4ed296c272f2: retpid=630, ret_val=0
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: *** Listening on filevine...
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: dequeueing jobs on queues filevine and timeout 405
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: dequeued job de96e6ec-9e86-4d3a-af74-99eccde1aa89 from filevine
+08:53:50 filevine: worker_tasks.process_project(2227572) (de96e6ec-9e86-4d3a-af74-99eccde1aa89)
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: started job registry set.
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: preparing for execution of job ID de96e6ec-9e86-4d3a-af74-99eccde1aa89
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 90 seconds.
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: job preparation finished.
+08:53:50 Worker adf88bd71e3945029878bf8a1cfe1d1e: performing job de96e6ec-9e86-4d3a-af74-99eccde1aa89 ...
+🚀 Worker: processing project 2227572
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⏳ Loading 2227572 – Diaz, Jenni Adrian et al - PROP213- 3 CAR COLLISION DRIVER ...
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⚠️ Rate limited, sleeping for 5 seconds...
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⚠️ Rate limited, sleeping for 5 seconds...
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⚠️ Request failed for /core/projects/2227572/lOJEIntake20Demo: 404 Client Error: Not Found for url: https://calljacob.api.filevineapp.com/core/projects/2227572/lOJEIntake20Demo
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+✅ Worker: done project 2227572
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: finished performing job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: finished performing job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: handling successful execution of job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: handling successful execution of job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: enqueueing dependents of job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: enqueueing dependents of job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: calling multi() on pipeline for job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: calling multi() on pipeline for job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: saving job de96e6ec-9e86-4d3a-af74-99eccde1aa89's successful execution result
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: saving job de96e6ec-9e86-4d3a-af74-99eccde1aa89's successful execution result
+08:54:17 Job de96e6ec-9e86-4d3a-af74-99eccde1aa89: handling success...
+DEBUG:rq.job:Job de96e6ec-9e86-4d3a-af74-99eccde1aa89: handling success...
+08:54:17 Cleaning up execution of job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+DEBUG:rq.worker:Cleaning up execution of job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+08:54:17 Cleaning up execution of job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+DEBUG:rq.worker:Cleaning up execution of job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+08:54:17 Successfully completed worker_tasks.process_project(2227572) job in 0:00:26.801778s on worker adf88bd71e3945029878bf8a1cfe1d1e
+INFO:rq.worker:Successfully completed worker_tasks.process_project(2227572) job in 0:00:26.801778s on worker adf88bd71e3945029878bf8a1cfe1d1e
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: finished handling successful execution of job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: finished handling successful execution of job de96e6ec-9e86-4d3a-af74-99eccde1aa89
+08:54:17 filevine: Job OK (de96e6ec-9e86-4d3a-af74-99eccde1aa89)
+INFO:rq.worker:filevine: Job OK (de96e6ec-9e86-4d3a-af74-99eccde1aa89)
+08:54:17 Result is kept for 500 seconds
+INFO:rq.worker:Result is kept for 500 seconds
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: work horse finished for job de96e6ec-9e86-4d3a-af74-99eccde1aa89: retpid=633, ret_val=0
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: *** Listening on filevine...
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: dequeueing jobs on queues filevine and timeout 405
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: dequeued job 43a33c2a-0af4-45e9-a258-24e6f49b33c8 from filevine
+08:54:17 filevine: worker_tasks.process_project(2227573) (43a33c2a-0af4-45e9-a258-24e6f49b33c8)
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: started job registry set.
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: preparing for execution of job ID 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 90 seconds.
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: job preparation finished.
+08:54:17 Worker adf88bd71e3945029878bf8a1cfe1d1e: performing job 43a33c2a-0af4-45e9-a258-24e6f49b33c8 ...
+🚀 Worker: processing project 2227573
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⏳ Loading 2227573 – Rodriquez, Adrian Rene (Passenger 1/1) - Diaz, Jenni Adriana et al (Auto/ 3 car collision / Moderate PD) ...
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⚠️ Request failed for /core/projects/2227573/lOJEIntake20Demo: 404 Client Error: Not Found for url: https://calljacob.api.filevineapp.com/core/projects/2227573/lOJEIntake20Demo
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+✅ Worker: done project 2227573
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: finished performing job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: finished performing job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: handling successful execution of job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: handling successful execution of job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: enqueueing dependents of job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: enqueueing dependents of job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: calling multi() on pipeline for job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: calling multi() on pipeline for job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: saving job 43a33c2a-0af4-45e9-a258-24e6f49b33c8's successful execution result
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: saving job 43a33c2a-0af4-45e9-a258-24e6f49b33c8's successful execution result
+08:54:34 Job 43a33c2a-0af4-45e9-a258-24e6f49b33c8: handling success...
+DEBUG:rq.job:Job 43a33c2a-0af4-45e9-a258-24e6f49b33c8: handling success...
+08:54:34 Cleaning up execution of job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+DEBUG:rq.worker:Cleaning up execution of job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+08:54:34 Cleaning up execution of job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+DEBUG:rq.worker:Cleaning up execution of job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+08:54:34 Successfully completed worker_tasks.process_project(2227573) job in 0:00:16.591926s on worker adf88bd71e3945029878bf8a1cfe1d1e
+INFO:rq.worker:Successfully completed worker_tasks.process_project(2227573) job in 0:00:16.591926s on worker adf88bd71e3945029878bf8a1cfe1d1e
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: finished handling successful execution of job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+DEBUG:rq.worker:Worker adf88bd71e3945029878bf8a1cfe1d1e: finished handling successful execution of job 43a33c2a-0af4-45e9-a258-24e6f49b33c8
+08:54:34 filevine: Job OK (43a33c2a-0af4-45e9-a258-24e6f49b33c8)
+INFO:rq.worker:filevine: Job OK (43a33c2a-0af4-45e9-a258-24e6f49b33c8)
+08:54:34 Result is kept for 500 seconds
+INFO:rq.worker:Result is kept for 500 seconds
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: work horse finished for job 43a33c2a-0af4-45e9-a258-24e6f49b33c8: retpid=636, ret_val=0
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: *** Listening on filevine...
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: dequeueing jobs on queues filevine and timeout 405
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: dequeued job 5de9cbb5-0deb-4a47-b9ef-44dbcbbb6b9f from filevine
+08:54:34 filevine: worker_tasks.process_project(1701350) (5de9cbb5-0deb-4a47-b9ef-44dbcbbb6b9f)
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 480 seconds.
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: started job registry set.
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: preparing for execution of job ID 5de9cbb5-0deb-4a47-b9ef-44dbcbbb6b9f
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: sent heartbeat to prevent worker timeout. Next one should arrive in 90 seconds.
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: job preparation finished.
+08:54:34 Worker adf88bd71e3945029878bf8a1cfe1d1e: performing job 5de9cbb5-0deb-4a47-b9ef-44dbcbbb6b9f ...
+🚀 Worker: processing project 1701350
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⏳ Loading 1701350 – Dominguez, Salvador Flores (Commercial vs Commercial / OOS / Major PD)RXINJ ...
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⚠️ Rate limited, sleeping for 5 seconds...
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⚠️ Rate limited, sleeping for 5 seconds...
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⚠️ Rate limited, sleeping for 5 seconds...
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⚠️ Rate limited, sleeping for 5 seconds...
+^C08:54:58 Worker adf88bd71e3945029878bf8a1cfe1d1e: got signal SIGINT
+08:54:58 Worker adf88bd71e3945029878bf8a1cfe1d1e [PID 627]: warm shut down requested
+08:54:58 Worker adf88bd71e3945029878bf8a1cfe1d1e: stopping after current horse is finished. Press Ctrl+C again for a cold shutdown.
+^C08:54:58 Worker adf88bd71e3945029878bf8a1cfe1d1e: shutdown signal ignored, received twice in less than 1 second
+INFO:root:Requesting new access token from /session...
+INFO:root:✅ Token refresh successful.
+⚠️ Rate limited, sleeping for 5 seconds...
+^C08:55:01 Worker adf88bd71e3945029878bf8a1cfe1d1e: cold shut down
+08:55:01 Worker adf88bd71e3945029878bf8a1cfe1d1e: taking down horse 640 with me
+08:55:01 Worker adf88bd71e3945029878bf8a1cfe1d1e: killed horse pid 640
+08:55:01 Worker adf88bd71e3945029878bf8a1cfe1d1e: registering death
+08:55:01 Worker adf88bd71e3945029878bf8a1cfe1d1e: unsubscribing from channel rq:pubsub:adf88bd71e3945029878bf8a1cfe1d1e
+(venv) kritagya@Kritagya-Kumra-BRPC93:/mnt/c/Kritagya Folder/FileVineBI/filevineBIDashboardServer$ ^C
+(venv) kritagya@Kritagya-Kumra-BRPC93:/mnt/c/Kritagya Folder/FileVineBI/filevineBIDashboardServer$ ^C
+(venv) kritagya@Kritagya-Kumra-BRPC93:/mnt/c/Kritagya Folder/FileVineBI/filevineBIDashboardServer$
